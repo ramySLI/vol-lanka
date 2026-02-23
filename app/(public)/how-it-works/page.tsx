@@ -1,63 +1,71 @@
 import { Button } from "@/components/ui/button";
+import { fetchPageContentREST } from "@/lib/firebase/firestore-rest";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 
-export default function HowItWorksPage() {
+export default async function HowItWorksPage() {
+    const data = await fetchPageContentREST("how-it-works");
+
+    if (!data) {
+        notFound();
+    }
+
     return (
-        <div className="container mx-auto px-4 py-16">
-            <div className="text-center max-w-2xl mx-auto mb-16">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">How It Works</h1>
-                <p className="text-xl text-muted-foreground">
-                    Your journey to making an impact in Sri Lanka is just a few steps away. We've made the application process as simple and supportive as possible.
-                </p>
-            </div>
-
-            <div className="max-w-4xl mx-auto space-y-12">
-                {/* Step 1 */}
-                <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start relative border-l-2 md:border-none pl-6 md:pl-0 border-primary ml-4 md:ml-0">
-                    <div className="md:w-1/3 text-left md:text-right pt-2">
-                        <h3 className="text-xl font-bold text-primary">01. Discover</h3>
+        <div className="bg-slate-50 min-h-screen pb-24">
+            <div className="bg-primary/5 border-b border-primary/10">
+                <div className="container mx-auto px-4 py-20 text-center max-w-3xl">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm mb-6">
+                        <Sparkles className="w-4 h-4" />
+                        <span>Simple Process</span>
                     </div>
-                    <div className="md:w-2/3 bg-card rounded-lg p-6 shadow-sm border">
-                        <h4 className="font-semibold text-lg mb-2">Find Your Perfect Program</h4>
-                        <p className="text-muted-foreground">Browse our range of ethical volunteer programs happening across Sri Lanka. Whether your passion is wildlife conservation, teaching, or medical care, find the initiative that speaks to you.</p>
-                    </div>
-                </div>
-
-                {/* Step 2 */}
-                <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start relative border-l-2 md:border-none pl-6 md:pl-0 border-primary ml-4 md:ml-0">
-                    <div className="md:w-1/3 text-left md:text-right pt-2">
-                        <h3 className="text-xl font-bold text-primary">02. Apply</h3>
-                    </div>
-                    <div className="md:w-2/3 bg-card rounded-lg p-6 shadow-sm border">
-                        <h4 className="font-semibold text-lg mb-2">Complete the 5-Step Form</h4>
-                        <p className="text-muted-foreground">Select your ideal dates and duration. Our streamlined application process collects your personal details, experience, and travel info. Reserve your spot by paying a 50% deposit via our secure Stripe integration.</p>
-                    </div>
-                </div>
-
-                {/* Step 3 */}
-                <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start relative border-l-2 md:border-none pl-6 md:pl-0 border-primary ml-4 md:ml-0">
-                    <div className="md:w-1/3 text-left md:text-right pt-2">
-                        <h3 className="text-xl font-bold text-primary">03. Prepare</h3>
-                    </div>
-                    <div className="md:w-2/3 bg-card rounded-lg p-6 shadow-sm border">
-                        <h4 className="font-semibold text-lg mb-2">Pre-Departure Dashboard</h4>
-                        <p className="text-muted-foreground">Log in to your Volunteer Dashboard to access your interactive checklist. From booking your flight to securing visas and packing, we guide you through every necessary step before departure.</p>
-                    </div>
-                </div>
-
-                {/* Step 4 */}
-                <div className="flex flex-col md:flex-row gap-6 md:gap-12 items-start relative pl-6 md:pl-0 ml-4 md:ml-0">
-                    <div className="md:w-1/3 text-left md:text-right pt-2">
-                        <h3 className="text-xl font-bold text-primary">04. Experience</h3>
-                    </div>
-                    <div className="md:w-2/3 bg-card rounded-lg p-6 shadow-sm border">
-                        <h4 className="font-semibold text-lg mb-2">Arrive & Volunteer</h4>
-                        <p className="text-muted-foreground">We handle your airport pickup, accommodation, and orientation. Dive directly into your project with the backing of our 24/7 dedicated support team on the ground.</p>
-                    </div>
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 text-slate-900">
+                        {data.title}
+                    </h1>
+                    <p className="text-xl text-slate-600 leading-relaxed font-medium">
+                        {data.subtitle}
+                    </p>
                 </div>
             </div>
 
-            <div className="text-center mt-16">
-                <Button size="lg" className="px-8 py-6 text-lg">Start Exploring Programs</Button>
+            <div className="container mx-auto px-4 py-16 max-w-5xl">
+                <div className="space-y-12">
+                    {data.steps?.map((step: any, index: number) => (
+                        <div key={index} className="group flex flex-col md:flex-row gap-8 md:gap-12 items-start relative bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+                            <div className="md:w-1/3 flex flex-col relative z-10">
+                                <span className="text-6xl font-black text-slate-100 group-hover:text-primary/10 transition-colors absolute -top-8 -left-4 md:-top-10 md:-left-6 z-0 pointer-events-none select-none">
+                                    {step.number}
+                                </span>
+                                <div className="text-sm font-bold text-primary tracking-widest uppercase mb-3 relative z-10 flex items-center gap-2">
+                                    <div className="w-8 h-1 bg-primary rounded-full"></div>
+                                    {step.tag}
+                                </div>
+                                <h3 className="text-2xl font-bold text-slate-900 relative z-10 leading-snug">
+                                    {step.title}
+                                </h3>
+                            </div>
+                            <div className="md:w-2/3 relative z-10">
+                                <p className="text-lg text-slate-600 leading-relaxed">
+                                    {step.description}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-20 text-center bg-white p-12 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                        <CheckCircle2 className="w-8 h-8 text-primary" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Begin?</h2>
+                    <p className="text-slate-600 mb-8 max-w-xl text-lg">We are here to support you at every stage, offering authentic and ethical experiences in Sri Lanka.</p>
+                    <Button asChild size="lg" className="px-8 py-6 text-lg rounded-full shadow-lg group">
+                        <Link href={data.ctaLink || "/programs"} className="flex items-center gap-2">
+                            {data.ctaText || "Start Exploring"}
+                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                    </Button>
+                </div>
             </div>
         </div>
     );

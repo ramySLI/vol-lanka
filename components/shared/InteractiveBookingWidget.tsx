@@ -48,7 +48,7 @@ export default function InteractiveBookingWidget({
 
                 <div>
                     <label className="text-sm font-medium mb-2 block">2. Select Start Date (Mondays)</label>
-                    <div className="border rounded-md p-2 bg-background flex justify-center">
+                    <div className="border rounded-md p-2 bg-background w-full overflow-hidden flex justify-center">
                         <Calendar
                             mode="single"
                             selected={startDate}
@@ -57,7 +57,7 @@ export default function InteractiveBookingWidget({
                                 // Only allow Mondays in the future
                                 return date.getDay() !== 1 || date < new Date();
                             }}
-                            className="rounded-md"
+                            className="w-full"
                         />
                     </div>
                     {startDate && (

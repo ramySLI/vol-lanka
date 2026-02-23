@@ -1,37 +1,55 @@
+import Image from "next/image";
 import InteractiveBookingWidget from "@/components/shared/InteractiveBookingWidget";
+import { fetchProgramBySlugREST } from "@/lib/firebase/firestore-rest";
+import { notFound } from "next/navigation";
 
-export default function ProgramDetailPage() {
-    // Hardcoded for 'Sea Turtle Conservation' placeholder layout
-    const program = {
-        id: "1",
-        slug: "turtle-conservation-galle",
-        title: "Sea Turtle Conservation",
-        destinationId: "Galle, Sri Lanka",
-        pricing: { twoWeeks: 950, fourWeeks: 1450 },
-        rating: 4.8,
-        reviewCount: 124,
-    };
+interface PageProps {
+    params: Promise<{ slug: string }>;
+}
+
+const getProgramImage = (slug: string) => {
+    if (slug.includes('turtle')) return '/images/programs/sea-turtle.png';
+    if (slug.includes('elephant')) return '/images/programs/elephant.png';
+    if (slug.includes('english')) return '/images/programs/rural-english.png';
+    return '/images/programs/sea-turtle.png'; // fallback
+};
+
+export default async function ProgramDetailPage({ params }: PageProps) {
+    const { slug } = await params;
+    const program = await fetchProgramBySlugREST(slug);
+
+    if (!program) {
+        notFound();
+    }
 
     return (
         <div>
             {/* Hero Image Area */}
-            <div className="w-full h-[40vh] md:h-[50vh] bg-slate-200 relative flex flex-col justify-end pb-8">
-                <div className="container mx-auto px-4 z-10 relative">
-                    <div className="bg-white/90 p-4 md:p-6 rounded-xl inline-block shadow-sm max-w-2xl">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-primary mb-2 uppercase tracking-wide">
-                            <span>Conservation</span>
+            <div className="w-full h-[40vh] md:h-[50vh] relative flex flex-col justify-end pb-8 overflow-hidden">
+                <Image
+                    src={getProgramImage(program.slug)}
+                    alt={program.title}
+                    fill
+                    className="object-cover object-center absolute inset-0 z-0 brightness-75"
+                    quality={100}
+                    priority
+                />
+                <div className="container mx-auto px-4 z-10 relative mt-auto">
+                    <div className="bg-white/95 backdrop-blur shadow-xl p-6 md:p-8 rounded-2xl inline-block max-w-2xl transform translate-y-4">
+                        <div className="flex items-center gap-2 text-sm font-bold text-primary mb-3 uppercase tracking-wider">
+                            <span>{program.category.replace(/-/g, ' ')}</span>
                             <span>•</span>
-                            <span>{program.destinationId}</span>
+                            <span className="capitalize">{program.destinationId.replace(/-/g, ' ')}</span>
                         </div>
-                        <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-2">{program.title}</h1>
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                            <span className="font-medium">★ {program.rating}</span>
-                            <span className="underline cursor-pointer">({program.reviewCount} reviews)</span>
+                        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-3 text-slate-900">{program.title}</h1>
+                        <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
+                            <span className="flex items-center gap-1 text-amber-500">
+                                ★ {program.rating}
+                            </span>
+                            <span className="text-slate-400">•</span>
+                            <span className="hover:text-primary transition-colors cursor-pointer">{program.reviewCount} verified reviews</span>
                         </div>
                     </div>
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground bg-muted/50">
-                    Main Hero Image Placeholder
                 </div>
             </div>
 
@@ -52,36 +70,50 @@ export default function ProgramDetailPage() {
                         <section className="space-y-4">
                             <h2 className="text-2xl font-bold">Program Overview</h2>
                             <p className="text-muted-foreground leading-relaxed text-lg">
-                                Join our dedicated team on the southern coast of Sri Lanka to protect endangered sea turtles.
-                                As a volunteer, you will participate in crucial conservation efforts, including beach patrols, nest protection,
-                                and the rehabilitation of injured turtles recovered from the ocean.
+                                {program.shortDescription}
                             </p>
                             <p className="text-muted-foreground leading-relaxed">
-                                This hands-on program allows you to work closely with local experts and marine biologists to understand maritime
-                                ecosystems. When not on the beach, you'll engage with the local community, organizing beach cleanups and
-                                educational workshops for young students to raise awareness about local environmental challenges.
+                                {program.fullDescription}
                             </p>
                         </section>
+
+                        {/* Schedule */}
+                        {program.schedule && program.schedule.length > 0 && (
+                            <section className="space-y-4">
+                                <h2 className="text-2xl font-bold">Sample Schedule</h2>
+                                <div className="space-y-4">
+                                    {program.schedule.map((item, index) => (
+                                        <div key={index} className="flex gap-4 p-4 rounded-lg bg-muted/30 border">
+                                            <div className="font-bold text-primary shrink-0 w-16">Day {item.day}</div>
+                                            <div className="text-muted-foreground">{item.activity}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
 
                         {/* Included / Not Included Grids */}
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-muted/30 p-8 rounded-xl border">
                             <div>
                                 <h3 className="font-bold text-lg mb-4 text-green-700">What's Included</h3>
                                 <ul className="space-y-2">
-                                    <li className="flex items-center gap-2">✓ Airport pickup (Colombo)</li>
-                                    <li className="flex items-center gap-2">✓ Shared volunteer accommodation</li>
-                                    <li className="flex items-center gap-2">✓ 3 local meals per day</li>
-                                    <li className="flex items-center gap-2">✓ 24/7 in-country support</li>
-                                    <li className="flex items-center gap-2">✓ Program orientation & training</li>
+                                    {(program.included || []).map((item, i) => (
+                                        <li key={i} className="flex items-start gap-2">
+                                            <span className="text-green-600 mt-0.5">✓</span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                             <div>
                                 <h3 className="font-bold text-lg mb-4 text-red-700">What's Not Included</h3>
                                 <ul className="space-y-2 text-muted-foreground">
-                                    <li className="flex items-center gap-2">✗ Flights</li>
-                                    <li className="flex items-center gap-2">✗ Travel Insurance (Mandatory)</li>
-                                    <li className="flex items-center gap-2">✗ Visas</li>
-                                    <li className="flex items-center gap-2">✗ Weekend excursions</li>
+                                    {(program.notIncluded || []).map((item, i) => (
+                                        <li key={i} className="flex items-start gap-2">
+                                            <span className="text-red-500 mt-0.5">✗</span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         </section>
@@ -91,8 +123,8 @@ export default function ProgramDetailPage() {
                     <div className="w-full lg:w-[380px] shrink-0">
                         <InteractiveBookingWidget
                             programId={program.slug}
-                            priceTwoWeeks={program.pricing.twoWeeks}
-                            priceFourWeeks={program.pricing.fourWeeks}
+                            priceTwoWeeks={program.pricing?.twoWeeks || 0}
+                            priceFourWeeks={program.pricing?.fourWeeks || 0}
                         />
                     </div>
                 </div>

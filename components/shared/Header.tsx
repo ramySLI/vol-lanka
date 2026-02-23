@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { user, signOut } = useAuth();
 
     return (
         <header className="border-b bg-background sticky top-0 z-50 p-4">
@@ -33,12 +35,30 @@ export function Header() {
 
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center space-x-4">
-                    <Button variant="ghost" asChild>
-                        <Link href="/login">Log in</Link>
-                    </Button>
-                    <Button asChild>
-                        <Link href="/programs">Apply Now</Link>
-                    </Button>
+                    {user ? (
+                        <>
+                            {user.uid === 'VgDjrSqImwQcX4TBKUtH1gu8vbQ2' && (
+                                <Button variant="ghost" className="text-primary font-bold" asChild>
+                                    <Link href="/admin">Admin Panel</Link>
+                                </Button>
+                            )}
+                            <Button variant="ghost" asChild>
+                                <Link href="/dashboard">Dashboard</Link>
+                            </Button>
+                            <Button variant="outline" onClick={() => signOut()}>
+                                Logout
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="ghost" asChild>
+                                <Link href="/login">Log in</Link>
+                            </Button>
+                            <Button asChild>
+                                <Link href="/programs">Apply Now</Link>
+                            </Button>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile Menu Toggle */}
@@ -67,12 +87,30 @@ export function Header() {
                         FAQ
                     </Link>
                     <div className="h-px bg-muted my-2 w-full" />
-                    <Button variant="ghost" asChild className="justify-start w-full">
-                        <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Log in</Link>
-                    </Button>
-                    <Button asChild className="w-full">
-                        <Link href="/programs" onClick={() => setIsMobileMenuOpen(false)}>Apply Now</Link>
-                    </Button>
+                    {user ? (
+                        <>
+                            {user.uid === 'VgDjrSqImwQcX4TBKUtH1gu8vbQ2' && (
+                                <Button variant="ghost" className="justify-start w-full text-primary font-bold" asChild>
+                                    <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>Admin Panel</Link>
+                                </Button>
+                            )}
+                            <Button variant="ghost" asChild className="justify-start w-full">
+                                <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
+                            </Button>
+                            <Button variant="outline" className="w-full" onClick={() => { signOut(); setIsMobileMenuOpen(false); }}>
+                                Logout
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="ghost" asChild className="justify-start w-full">
+                                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Log in</Link>
+                            </Button>
+                            <Button asChild className="w-full">
+                                <Link href="/programs" onClick={() => setIsMobileMenuOpen(false)}>Apply Now</Link>
+                            </Button>
+                        </>
+                    )}
                 </div>
             )}
         </header>
