@@ -1,18 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { fetchProgramsREST } from "@/lib/firebase/firestore-rest";
-
-const getProgramImage = (slug: string) => {
-  if (slug.includes('turtle')) return '/images/programs/sea-turtle.png';
-  if (slug.includes('elephant')) return '/images/programs/elephant.png';
-  if (slug.includes('english')) return '/images/programs/rural-english.png';
-  return '/images/programs/sea-turtle.png'; // fallback
-};
+import { fetchProgramsREST, fetchPageContentREST } from "@/lib/firebase/firestore-rest";
 
 export default async function Home() {
   const allPrograms = await fetchProgramsREST();
   const featuredPrograms = allPrograms.filter(p => p.featured).slice(0, 3);
+  const data = await fetchPageContentREST("home") || {
+    heroTitle: "Volunteer in Sri Lanka",
+    heroSubtitle: "Connect with meaningful volunteer opportunities. Experience the culture, make an impact, and create lifelong memories.",
+    heroImage: "/images/hero.png",
+    featuredTitle: "Featured Programs",
+    featuredSubtitle: "Top-rated opportunities carefully vetted for maximum positive impact."
+  };
 
   return (
     <>
@@ -21,7 +21,7 @@ export default async function Home() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/hero.png"
+            src={data.heroImage || "/images/hero.png"}
             alt="Beautiful Sri Lanka tea plantation at sunset with a train"
             fill
             className="object-cover object-center brightness-75"
@@ -35,18 +35,18 @@ export default async function Home() {
           <div className="flex flex-col items-center space-y-6 text-center text-white">
             <div className="space-y-4 max-w-4xl drop-shadow-lg">
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                Volunteer in Sri Lanka
+                {data.heroTitle}
               </h1>
               <p className="mx-auto max-w-[800px] text-lg sm:text-xl md:text-2xl font-medium text-white/90">
-                Connect with meaningful volunteer opportunities. Experience the culture, make an impact, and create lifelong memories.
+                {data.heroSubtitle}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 rounded-full shadow-xl">
-                <Link href="/programs">Find a Program!</Link>
+                <Link href={data.primaryCtaLink || "/programs"}>{data.primaryCtaText || "Find a Program!"}</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm text-lg px-8 py-6 rounded-full shadow-xl">
-                <Link href="/how-it-works">How it Works</Link>
+                <Link href={data.secondaryCtaLink || "/how-it-works"}>{data.secondaryCtaText || "How it Works"}</Link>
               </Button>
             </div>
           </div>
@@ -57,15 +57,15 @@ export default async function Home() {
       <section className="w-full py-16 md:py-24 bg-slate-50">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-slate-900">Featured Programs</h2>
-            <p className="mt-4 text-muted-foreground w-full max-w-2xl text-lg">Top-rated opportunities carefully vetted for maximum positive impact.</p>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-slate-900">{data.featuredTitle}</h2>
+            <p className="mt-4 text-muted-foreground w-full max-w-2xl text-lg">{data.featuredSubtitle}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredPrograms.map((program) => (
               <div key={program.id} className="group flex flex-col rounded-2xl border bg-card text-card-foreground shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1">
                 <div className="relative h-60 w-full overflow-hidden">
                   <Image
-                    src={getProgramImage(program.slug)}
+                    src={program.images?.[0] || '/images/programs/sea-turtle.png'}
                     alt={program.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

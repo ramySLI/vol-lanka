@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
@@ -31,7 +32,7 @@ function DashboardContent() {
             try {
                 const q = query(collection(db, "applications"), where("userId", "==", user.uid));
                 const querySnapshot = await getDocs(q);
-                let apps = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                const apps = querySnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                 // Sort to get the most recent active application
                 apps.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
                 setApplications(apps);
@@ -111,7 +112,7 @@ function DashboardContent() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user.displayName || user.email?.split('@')[0]}</h1>
-                    <p className="text-muted-foreground mt-1">Here's the status of your volunteer journey.</p>
+                    <p className="text-muted-foreground mt-1">Here&apos;s the status of your volunteer journey.</p>
                 </div>
                 <Button variant="outline" asChild>
                     <Link href="/programs">Find Another Program</Link>
@@ -159,7 +160,7 @@ function DashboardContent() {
                                     <Plane className="w-8 h-8 text-muted-foreground opacity-50" />
                                 </div>
                                 <h3 className="text-xl font-bold mb-2">No active applications</h3>
-                                <p className="text-muted-foreground mb-6">You haven't applied to any programs yet. Find your perfect volunteer opportunity today!</p>
+                                <p className="text-muted-foreground mb-6">You haven&apos;t applied to any programs yet. Find your perfect volunteer opportunity today!</p>
                                 <Button asChild size="lg">
                                     <Link href="/programs">Browse Programs</Link>
                                 </Button>

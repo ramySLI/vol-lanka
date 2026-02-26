@@ -9,12 +9,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Search } from "lucide-react";
 import { Program } from "@/types/program";
 
-const getProgramImage = (slug: string) => {
-    if (slug.includes('turtle')) return '/images/programs/sea-turtle.png';
-    if (slug.includes('elephant')) return '/images/programs/elephant.png';
-    if (slug.includes('english')) return '/images/programs/rural-english.png';
-    return '/images/programs/sea-turtle.png'; // fallback
-};
 
 export function ProgramsClientList({ initialPrograms }: { initialPrograms: Program[] }) {
     const [searchQuery, setSearchQuery] = useState("");
@@ -162,7 +156,7 @@ export function ProgramsClientList({ initialPrograms }: { initialPrograms: Progr
                                 <Card key={program.id} className="group flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                                     <div className="h-48 bg-muted relative overflow-hidden">
                                         <Image
-                                            src={getProgramImage(program.slug)}
+                                            src={program.images?.[0] || '/images/programs/sea-turtle.png'}
                                             alt={program.title}
                                             fill
                                             className="object-cover transition-transform duration-500 group-hover:scale-105"

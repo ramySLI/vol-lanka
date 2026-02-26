@@ -40,7 +40,7 @@ export default function ApplicationForm({ programId, duration, startDate }: { pr
 
     useEffect(() => {
         if (!loading && user && currentStep === 0) {
-            setCurrentStep(1); // Auto-advance to Personal Info if authenticated
+            setTimeout(() => setCurrentStep(1), 0); // Auto-advance to Personal Info if authenticated
         }
     }, [user, loading, currentStep]);
 
@@ -87,7 +87,7 @@ export default function ApplicationForm({ programId, duration, startDate }: { pr
 
         try {
             // Save to Firestore 'applications' collection
-            const docRef = await addDoc(collection(db, "applications"), {
+            await addDoc(collection(db, "applications"), {
                 userId: user.uid,
                 programId,
                 durationWeeks: duration,
@@ -114,7 +114,7 @@ export default function ApplicationForm({ programId, duration, startDate }: { pr
 
             // Redirect to success/dashboard
             router.push("/dashboard?application=success");
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Error submitting application:", err);
             setError("Failed to submit application. Please try again.");
             setIsSubmitting(false);
@@ -234,7 +234,7 @@ export default function ApplicationForm({ programId, duration, startDate }: { pr
                     {/* Step 3: Travel */}
                     {currentStep === 3 && (
                         <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground">You can provide these details later from your dashboard if you haven't booked flights yet.</p>
+                            <p className="text-sm text-muted-foreground">You can provide these details later from your dashboard if you haven&apos;t booked flights yet.</p>
                             <div className="space-y-2">
                                 <Label>Expected Arrival Date in Colombo (CMB)</Label>
                                 <Input

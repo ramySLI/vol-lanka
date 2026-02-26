@@ -7,12 +7,6 @@ interface PageProps {
     params: Promise<{ slug: string }>;
 }
 
-const getProgramImage = (slug: string) => {
-    if (slug.includes('turtle')) return '/images/programs/sea-turtle.png';
-    if (slug.includes('elephant')) return '/images/programs/elephant.png';
-    if (slug.includes('english')) return '/images/programs/rural-english.png';
-    return '/images/programs/sea-turtle.png'; // fallback
-};
 
 export default async function ProgramDetailPage({ params }: PageProps) {
     const { slug } = await params;
@@ -27,7 +21,7 @@ export default async function ProgramDetailPage({ params }: PageProps) {
             {/* Hero Image Area */}
             <div className="w-full h-[40vh] md:h-[50vh] relative flex flex-col justify-end pb-8 overflow-hidden">
                 <Image
-                    src={getProgramImage(program.slug)}
+                    src={program.images?.[0] || '/images/programs/sea-turtle.png'}
                     alt={program.title}
                     fill
                     className="object-cover object-center absolute inset-0 z-0 brightness-75"
@@ -95,7 +89,7 @@ export default async function ProgramDetailPage({ params }: PageProps) {
                         {/* Included / Not Included Grids */}
                         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-muted/30 p-8 rounded-xl border">
                             <div>
-                                <h3 className="font-bold text-lg mb-4 text-green-700">What's Included</h3>
+                                <h3 className="font-bold text-lg mb-4 text-green-700">What&apos;s Included</h3>
                                 <ul className="space-y-2">
                                     {(program.included || []).map((item, i) => (
                                         <li key={i} className="flex items-start gap-2">
@@ -106,7 +100,7 @@ export default async function ProgramDetailPage({ params }: PageProps) {
                                 </ul>
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg mb-4 text-red-700">What's Not Included</h3>
+                                <h3 className="font-bold text-lg mb-4 text-red-700">What&apos;s Not Included</h3>
                                 <ul className="space-y-2 text-muted-foreground">
                                     {(program.notIncluded || []).map((item, i) => (
                                         <li key={i} className="flex items-start gap-2">

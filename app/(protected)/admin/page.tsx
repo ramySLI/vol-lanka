@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -10,12 +11,10 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 
 export default function AdminDashboardPage() {
-    const { user, loading } = useAuth();
+    const { user, isAdmin, loading } = useAuth();
     const router = useRouter();
     const [applications, setApplications] = useState<any[]>([]);
     const [isLoadingApps, setIsLoadingApps] = useState(true);
-
-    const isAdmin = user?.uid === "VgDjrSqImwQcX4TBKUtH1gu8vbQ2";
 
     useEffect(() => {
         if (!loading && (!user || !isAdmin)) {
@@ -67,7 +66,7 @@ export default function AdminDashboardPage() {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="p-8 w-full max-w-5xl">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
                 <p className="text-muted-foreground mt-1">Manage volunteer applications and platform data.</p>

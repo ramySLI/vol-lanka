@@ -14,5 +14,8 @@
         "supportEmail": "ramy.niranjan@gmail.com"
       }
     }
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }

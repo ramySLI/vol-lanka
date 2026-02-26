@@ -54,5 +54,13 @@ service cloud.firestore {
       // Admins can manage all user profiles
       allow read, write: if isAdmin();
     }
+    match /admins/{adminId} {
+      // Admins collection cannot be written by clients usually
+      allow read: if true; 
+      allow write: if isAdmin();
+    }
+    match /settings/{settingId} {
+      allow read, write: if true; // TEMPORARY
+    }
   }
 }

@@ -10,12 +10,14 @@ import {
     signInWithEmailAndPassword,
     signOut as firebaseSignOut
 } from "firebase/auth";
-import { auth } from "@/lib/firebase/config";
+import { auth, db } from "@/lib/firebase/config";
+import { doc, getDoc } from "firebase/firestore";
 import { User as UserType } from "@/types/user";
 
 interface AuthContextType {
     user: FirebaseUser | null;
     userData: UserType | null;
+    isAdmin: boolean;
     loading: boolean;
     signInWithGoogle: () => Promise<void>;
     signInWithEmail: (email: string, password: string) => Promise<void>;
@@ -26,6 +28,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
     user: null,
     userData: null,
+    isAdmin: false,
     loading: true,
     signInWithGoogle: async () => { },
     signInWithEmail: async () => { },
@@ -36,6 +39,7 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<FirebaseUser | null>(null);
     const [userData, setUserData] = useState<UserType | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -57,8 +61,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     updatedAt: new Date(),
                     lastLogin: new Date()
                 });
+
+                // Check Admin Status Dynamically
+                try {
+                    const adminDoc = await getDoc(doc(db, "admins", firebaseUser.uid));
+                    setIsAdmin(adminDoc.exists());
+                } catch {
+                    setIsAdmin(false);
+                }
             } else {
                 setUserData(null);
+                setIsAdmin(false);
             }
             setLoading(false);
         });
@@ -103,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, userData, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut }}>
+        <AuthContext.Provider value={{ user, userData, isAdmin, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut }}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Program } from "@/types/program";
 
 /**
@@ -10,7 +11,7 @@ export async function fetchProgramsREST(): Promise<Program[]> {
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const res = await fetch(
         `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/programs`,
-        { next: { revalidate: 60 } } // Cache for 60 seconds
+        { next: { tags: ['programs'] } } // Cache indefinitely, clear via webhook
     );
 
     if (!res.ok) {
@@ -27,7 +28,7 @@ export async function fetchProgramBySlugREST(slug: string): Promise<Program | nu
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const res = await fetch(
         `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/programs/${slug}`,
-        { next: { revalidate: 60 } }
+        { next: { tags: ['programs', `program-${slug}`] } }
     );
 
     if (!res.ok) {
@@ -46,12 +47,28 @@ export async function fetchPageContentREST(slug: string): Promise<any | null> {
     const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
     const res = await fetch(
         `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/pages/${slug}`,
-        { next: { revalidate: 60 } }
+        { next: { tags: ['pages', `page-${slug}`] } }
     );
 
     if (!res.ok) {
         if (res.status === 404) return null;
         throw new Error("Failed to fetch page data");
+    }
+
+    const data = await res.json();
+    return parseFirestoreDocument(data);
+}
+
+export async function fetchSettingsREST(slug: string): Promise<any | null> {
+    const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    const res = await fetch(
+        `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/settings/${slug}`,
+        { next: { tags: ['settings', `setting-${slug}`] } }
+    );
+
+    if (!res.ok) {
+        if (res.status === 404) return null;
+        throw new Error("Failed to fetch settings data");
     }
 
     const data = await res.json();

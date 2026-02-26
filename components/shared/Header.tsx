@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/components/providers/AuthProvider";
 
-export function Header() {
+interface HeaderProps {
+    navigationMenu?: Record<string, { label: string; href: string }[]>;
+}
+
+export function Header({ navigationMenu }: HeaderProps) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { user, signOut } = useAuth();
+    const { user, isAdmin, signOut } = useAuth();
+    const discoverLinks = navigationMenu?.discover || [];
 
     return (
         <header className="border-b bg-background sticky top-0 z-50 p-4">
@@ -19,25 +24,18 @@ export function Header() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden md:flex items-center space-x-6">
-                    <Link href="/programs" className="text-sm font-medium hover:text-primary transition-colors">
-                        Our Programs
-                    </Link>
-                    <Link href="/how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
-                        How It Works
-                    </Link>
-                    <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
-                        About Us
-                    </Link>
-                    <Link href="/faq" className="text-sm font-medium hover:text-primary transition-colors">
-                        FAQ
-                    </Link>
+                    {discoverLinks.map(link => (
+                        <Link key={link.href} href={link.href} className="text-sm font-medium hover:text-primary transition-colors">
+                            {link.label}
+                        </Link>
+                    ))}
                 </nav>
 
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center space-x-4">
                     {user ? (
                         <>
-                            {user.uid === 'VgDjrSqImwQcX4TBKUtH1gu8vbQ2' && (
+                            {isAdmin && (
                                 <Button variant="ghost" className="text-primary font-bold" asChild>
                                     <Link href="/admin">Admin Panel</Link>
                                 </Button>
@@ -74,22 +72,20 @@ export function Header() {
             {/* Mobile Nav Dropdown */}
             {isMobileMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 w-full bg-background border-b shadow-lg py-4 px-4 flex flex-col space-y-4 z-40">
-                    <Link href="/programs" className="text-sm font-medium hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                        Our Programs
-                    </Link>
-                    <Link href="/how-it-works" className="text-sm font-medium hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                        How It Works
-                    </Link>
-                    <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                        About Us
-                    </Link>
-                    <Link href="/faq" className="text-sm font-medium hover:text-primary transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                        FAQ
-                    </Link>
+                    {discoverLinks.map(link => (
+                        <Link
+                            key={link.href}
+                            href={link.href}
+                            className="text-sm font-medium hover:text-primary transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
                     <div className="h-px bg-muted my-2 w-full" />
                     {user ? (
                         <>
-                            {user.uid === 'VgDjrSqImwQcX4TBKUtH1gu8vbQ2' && (
+                            {isAdmin && (
                                 <Button variant="ghost" className="justify-start w-full text-primary font-bold" asChild>
                                     <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>Admin Panel</Link>
                                 </Button>

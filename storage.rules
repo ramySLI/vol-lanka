@@ -1,0 +1,26 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Function to check if the user is an Admin
+    function isAdmin() {
+      return isAuthenticated() && request.auth.uid == 'VgDjrSqImwQcX4TBKUtH1gu8vbQ2';
+    }
+
+    // Images for programs and homepage hero
+    match /images/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Fallback for everything else
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -30,7 +30,7 @@ export default async function HowItWorksPage() {
 
             <div className="container mx-auto px-4 py-16 max-w-5xl">
                 <div className="space-y-12">
-                    {data.steps?.map((step: any, index: number) => (
+                    {data.steps?.map((step: { number: string; tag: string; title: string; description: string }, index: number) => (
                         <div key={index} className="group flex flex-col md:flex-row gap-8 md:gap-12 items-start relative bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                             <div className="md:w-1/3 flex flex-col relative z-10">
                                 <span className="text-6xl font-black text-slate-100 group-hover:text-primary/10 transition-colors absolute -top-8 -left-4 md:-top-10 md:-left-6 z-0 pointer-events-none select-none">

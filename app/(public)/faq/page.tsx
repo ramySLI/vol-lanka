@@ -30,7 +30,7 @@ export default async function FAQPage() {
 
             <div className="container mx-auto px-4 py-16 max-w-4xl">
                 <div className="space-y-6">
-                    {data.faqs?.map((faq: any, index: number) => (
+                    {data.faqs?.map((faq: { question: string; answer: string }, index: number) => (
                         <div key={index} className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                             <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-start gap-4">
                                 <span className="text-primary font-black opacity-30 mt-1">Q.</span>
@@ -45,7 +45,7 @@ export default async function FAQPage() {
 
                 <div className="mt-20 text-center bg-white p-12 rounded-3xl shadow-sm border border-slate-100">
                     <h2 className="text-3xl font-bold text-slate-900 mb-6">Still have questions?</h2>
-                    <p className="text-slate-600 mb-8 max-w-xl mx-auto text-lg">We're always here to help. Explore our programs or reach out to our team directly.</p>
+                    <p className="text-slate-600 mb-8 max-w-xl mx-auto text-lg">We&apos;re always here to help. Explore our programs or reach out to our team directly.</p>
                     <Button asChild size="lg" className="px-8 py-6 text-lg rounded-full shadow-lg group">
                         <Link href={data.ctaLink || "/programs"} className="flex items-center gap-2">
                             {data.ctaText || "Explore Programs"}
